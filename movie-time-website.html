@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>MOVIE TIME | Independent AI Cinema</title>
+<style>
+:root{--bg:#080808;--panel:#141414;--gold:#f3c969;--muted:#aaa;--line:#292929}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(8,8,8,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-weight:900;letter-spacing:1.5px;font-size:22px;color:var(--gold)}.logo span{color:#fff}
+nav{display:flex;gap:16px;flex-wrap:wrap}nav a{color:#ddd;text-decoration:none;font-size:13px}
+.hero{padding:55px 5% 42px;background:radial-gradient(ellipse at 80% 20%,#47351b 0,transparent 42%),linear-gradient(110deg,#16110a,#080808 65%);border-bottom:1px solid var(--line)}
+.kicker{color:var(--gold);font-size:11px;letter-spacing:3px;font-weight:bold}.hero h1{font-size:clamp(36px,8vw,64px);line-height:.98;margin:14px 0}.hero p{max-width:570px;color:#c9c9c9;line-height:1.6}.pill{display:inline-block;background:var(--gold);color:#111;text-decoration:none;font-weight:bold;border-radius:5px;padding:12px 18px;margin-top:12px}
+main{padding:28px 5% 60px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0}.section-head h2{font-size:22px;margin:0}.section-head small{color:var(--muted)}
+input{width:100%;max-width:400px;background:#151515;border:1px solid #333;color:white;border-radius:8px;padding:12px;font-size:15px}
+.movies{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.movie{background:var(--panel);border:1px solid #242424;border-radius:10px;overflow:hidden}
+.poster{aspect-ratio:2/3;background:linear-gradient(145deg,#3b2c16,#111 65%);display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;position:relative}
+.poster .poster-title{font-size:clamp(18px,4vw,28px);font-weight:900;letter-spacing:1px;text-shadow:0 3px 15px #000}.poster .tag{position:absolute;top:10px;left:10px;background:var(--gold);color:#111;padding:5px 7px;font-size:10px;font-weight:bold;border-radius:3px}
+.details{padding:13px}.details h3{margin:0 0 6px;font-size:17px}.meta{color:var(--muted);font-size:12px;line-height:1.5}.watch{width:100%;margin-top:12px;padding:11px;border:0;border-radius:5px;background:var(--gold);font-weight:bold;cursor:pointer}
+.note{color:#aaa;font-size:12px;line-height:1.6;margin:14px 0 26px}
+.creators{display:grid;grid-template-columns:1fr;gap:10px}.creator{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);padding:14px;border-radius:9px}.avatar{width:44px;height:44px;border-radius:50%;background:#302719;color:var(--gold);display:grid;place-items:center;font-weight:bold}.creator p{margin:4px 0;color:var(--muted);font-size:12px}.insta{margin-left:auto;color:var(--gold);text-decoration:none;font-size:12px;font-weight:bold;white-space:nowrap}
+footer{border-top:1px solid var(--line);padding:25px 5%;color:#888;font-size:12px;line-height:1.6}
+dialog{width:min(94vw,850px);background:#101010;color:#fff;border:1px solid #444;border-radius:12px;padding:14px}dialog::backdrop{background:#000d}.modalhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.close{background:#333;color:#fff;border:0;border-radius:5px;padding:9px 12px}video{width:100%;max-height:70vh;background:#000}#playerError{color:#ffc;line-height:1.5;font-size:13px}
+@media(min-width:700px){.movies{grid-template-columns:repeat(4,minmax(0,1fr))}.creators{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding-top:80px;padding-bottom:70px}}
+</style>
+</head>
+<body>
+<header><div class="logo">MOVIE <span>TIME</span></div><nav><a href="#home">Home</a><a href="#movies">Movies</a><a href="#creators">Creators</a></nav></header>
+<section class="hero" id="home"><div class="kicker">YOUR STORIES. YOUR SCREEN.</div><h1>WELCOME TO<br><span style="color:var(--gold)">MOVIE TIME</span></h1><p>A home for original AI films and independent stories made by our team. Discover a film, meet its creators, and watch right here.</p><a class="pill" href="#movies">EXPLORE MOVIES ↓</a></section>
+<main>
+<section id="movies"><div class="section-head"><h2>Featured Movies</h2><small>Our team’s films</small></div><input id="search" type="search" placeholder="Search movie titles…" aria-label="Search movies">
+<div class="movies" id="movieGrid"></div>
+<p class="note">Demo cards are placeholders. To publish a real film, edit the MOVIES list in this file and add a direct MP4 video URL from a video host that allows embedding. Do not upload large video files to this website repository.</p>
+</section>
+<section id="creators"><div class="section-head"><h2>Meet Our Creators</h2><small>Behind the scenes</small></div><div class="creators" id="creatorGrid"></div></section>
+</main>
+<footer>© <span id="year"></span> MOVIE TIME · Independent student filmmaking project.<br>Only publish films you made or have permission to share. Instagram links and film details can be edited in the code.</footer>
+<dialog id="playerDialog"><div class="modalhead"><strong id="playerTitle">Now Playing</strong><button class="close" id="closePlayer">Close ✕</button></div><video id="video" controls playsinline preload="metadata"></video><p id="playerError">If playback does not start, check that the video URL is a direct MP4 link and the host permits playback on other websites.</p></dialog>
+<script>
+/* EDIT THESE EXAMPLES: video must be a direct video-file URL, not a webpage URL.
+   Keep video files on a separate host; GitHub Pages is for the website code. */
+const MOVIES = [
+ {title:"YOUR FIRST FILM",genre:"AI Short Film",duration:"Add duration",creator:"Creator Name",poster:"",videoUrl:""},
+ {title:"COMING SOON",genre:"Mystery / Drama",duration:"Coming soon",creator:"Creator Name",poster:"",videoUrl:""},
+ {title:"OUR NEXT STORY",genre:"Comedy / Adventure",duration:"Coming soon",creator:"Creator Name",poster:"",videoUrl:""}
+];
+const CREATORS = [
+ {name:"Creator Name",role:"Director · AI Filmmaker",instagram:"https://www.instagram.com/"},
+ {name:"Add Teammate",role:"Writer · Editor",instagram:"https://www.instagram.com/"}
+];
+const grid=document.getElementById("movieGrid");
+function renderMovies(filter=""){
+ grid.innerHTML="";
+ const results=MOVIES.filter(m=>(m.title+" "+m.genre+" "+m.creator).toLowerCase().includes(filter.toLowerCase()));
+ if(!results.length){grid.innerHTML='<p style="color:#aaa">No movies found.</p>';return}
+ results.forEach((m,i)=>{
+  const card=document.createElement("article");card.className="movie";
+  const poster=document.createElement("div");poster.className="poster";
+  if(m.poster){poster.style.backgroundImage=`linear-gradient(#0002,#0009),url("${m.poster}")`;poster.style.backgroundSize="cover";poster.style.backgroundPosition="center"}
+  poster.innerHTML='<span class="tag">MOVIE TIME ORIGINAL</span><div class="poster-title"></div>';poster.querySelector(".poster-title").textContent=m.title;
+  const details=document.createElement("div");details.className="details";
+  const h=document.createElement("h3");h.textContent=m.title;
+  const meta=document.createElement("div");meta.className="meta";meta.textContent=`${m.genre} · ${m.duration} · By ${m.creator}`;
+  const btn=document.createElement("button");btn.className="watch";btn.textContent="▶  WATCH NOW";
+  btn.addEventListener("click",()=>openMovie(m));
+  details.append(h,meta,btn);card.append(poster,details);grid.append(card);
+ });
+}
+function openMovie(m){
+ if(!m.videoUrl){alert("This is a demo card. Add this movie’s direct MP4 videoUrl in the MOVIES list in the code first.");return}
+ const video=document.getElementById("video");video.pause();video.src=m.videoUrl;video.load();document.getElementById("playerTitle").textContent=m.title;
+ document.getElementById("playerDialog").showModal();video.play().catch(()=>{});
+}
+document.getElementById("search").addEventListener("input",e=>renderMovies(e.target.value));
+document.getElementById("closePlayer").addEventListener("click",()=>{const v=document.getElementById("video");v.pause();v.removeAttribute("src");v.load();document.getElementById("playerDialog").close()});
+const cg=document.getElementById("creatorGrid");
+CREATORS.forEach(c=>{const row=document.createElement("div");row.className="creator";const av=document.createElement("div");av.className="avatar";av.textContent=c.name.trim().split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();const info=document.createElement("div");const name=document.createElement("strong");name.textContent=c.name;const role=document.createElement("p");role.textContent=c.role;info.append(name,role);const link=document.createElement("a");link.className="insta";link.href=c.instagram;link.target="_blank";link.rel="noopener noreferrer";link.textContent="INSTAGRAM ↗";row.append(av,info,link);cg.append(row)});
+document.getElementById("year").textContent=new Date().getFullYear();renderMovies();
+</script>
+</body>
+</html>
